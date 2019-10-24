@@ -13,5 +13,20 @@ def dummy():
         "data": {}
     })
 
+@app.route('/api/interface/generate')
+def interface_generate():
+    data = '''
+    {
+        a!textField(
+            label: "Label"
+        )
+    }
+    '''
+
+    return jsonify({
+        "success": True,
+        "data": data.strip()
+    })
+
 if __name__ == '__main__':
     app.run(debug=True)
