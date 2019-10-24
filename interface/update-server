@@ -1,0 +1,3 @@
+scp ./server.py appian@documenthackathon-19.appianci.net:/server/server.py
+scp ./requirements.txt appian@documenthackathon-19.appianci.net:/server/requirements.txt
+ssh appian@documenthackathon-19.appianci.net FLASK_APP=/server/server.py flask run -p 7002
