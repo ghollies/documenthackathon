@@ -10,7 +10,7 @@ import json
 app = Flask(__name__)
 
 
-@app.route('/api/dummy')
+@app.route('/api/document/dummy')
 def dummy():
     return jsonify({
         "success": True,
