@@ -1,2 +1,3 @@
-mock/mock/env
+**/env
 **/__pycache__
+document/template.docx

@@ -2,7 +2,9 @@
 
 from flask import Flask, jsonify, request, send_file
 from PyPDF2 import PdfFileReader, PdfFileWriter
+from docxtpl import DocxTemplate
 from io import BytesIO
+import json
 
 
 app = Flask(__name__)
@@ -15,6 +17,8 @@ def dummy():
         "data": {}
     })
 
+# request contains keys: doc-1, doc-2, ..., doc-n - which each
+# contain PDF files for merge
 @app.route('/api/document/merge', methods=['POST'])
 def document_merge():
     writer = PdfFileWriter()    
@@ -31,6 +35,26 @@ def document_merge():
         tmp,
         as_attachment=True,
         attachment_filename='merged.pdf'
+    )
+
+# request contains keys: context, document
+# context - text field of JSON which contains template context
+# template - template itself as `docx`
+@app.route('/api/document/template', methods=['POST'])
+def document_template():
+    context_raw = request.form['context']
+    document = request.files['document']
+
+    context = json.loads(context_raw)
+
+    template = DocxTemplate(document)
+    template.render(context)
+    template.save('template.docx')
+
+    return send_file(
+        './template.docx',
+        as_attachment=True,
+        attachment_filename='template.docx'
     )
 
 if __name__ == '__main__':
