@@ -23,6 +23,7 @@ def refresh_aws_session_credentials():
     global AWS_SESSION_CREDENTIALS
 
     # Get a token for an application role via get-vault-token
+    environ['VAULT_KUBERNETES_AUTH_BACKEND_ROLE'] = 'rekognition-detect-text-principal-role'
     completed_process = subprocess.run(['get-vault-token', '--application', 'rekognition-detect-text'], stdout=subprocess.PIPE, check=True)
     application_token = completed_process.stdout.decode().strip()
 
