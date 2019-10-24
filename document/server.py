@@ -49,13 +49,21 @@ def document_template():
 
     template = DocxTemplate(document)
     template.render(context)
-    template.save('template.docx')
 
-    return send_file(
-        './template.docx',
-        as_attachment=True,
-        attachment_filename='template.docx'
-    )
+    try:
+        template.save('template.docx')
+        return send_file(
+            './template.docx',
+            as_attachment=True,
+            attachment_filename='template.docx'
+        )
+    except FileNotFoundError:
+        template.save('/server/template.docx')
+        return send_file(
+            './template.docx',
+            as_attachment=True,
+            attachment_filename='template.docx'
+        )
 
 if __name__ == '__main__':
     app.run(debug=True)
