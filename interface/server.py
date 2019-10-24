@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 from flask import Flask, jsonify, request
-
+import analyzeShapes
 
 app = Flask(__name__)
 
@@ -13,19 +13,13 @@ def dummy():
         "data": {}
     })
 
-@app.route('/api/interface/generate')
+@app.route('/api/interface/generate', methods=['POST'])
 def interface_generate():
-    data = '''
-    {
-        a!textField(
-            label: "Label"
-        )
-    }
-    '''
+    data = analyzeShapes.main(request.data)
 
     return jsonify({
         "success": True,
-        "data": data.strip()
+        "data": data
     })
 
 if __name__ == '__main__':
