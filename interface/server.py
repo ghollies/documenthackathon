@@ -3,6 +3,7 @@
 from flask import Flask, jsonify, request
 from os import environ
 from datetime import datetime, timedelta
+import boto3
 import subprocess
 import requests
 
@@ -47,26 +48,34 @@ def dummy():
         "data": {}
     })
 
-@app.route('/api/interface/generate')
+@app.route('/api/interface/generate', methods=['POST'])
 def interface_generate():
     global AWS_SESSION_CREDENTIALS
 
     if datetime.now() - AWS_SESSION_CREDENTIALS['last_updated'] > timedelta(minutes=55):
         refresh_aws_session_credentials()
 
+    image = request.files['image']
+    client = boto3.client(
+        'rekognition',
+        region_name='us-east-1',
+        aws_access_key_id=AWS_SESSION_CREDENTIALS['aws_access_key_id'],
+        aws_secret_access_key=AWS_SESSION_CREDENTIALS['aws_secret_access_key'],
+        aws_session_token=AWS_SESSION_CREDENTIALS['aws_session_token'])
 
+    # TODO
 
-    # data = '''
-    # {
-    #     a!textField(
-    #         label: "Label"
-    #     )
-    # }
-    # '''
+    data = '''
+    {
+        a!textField(
+            label: "Label"
+        )
+    }
+    '''
 
     return jsonify({
         "success": True,
-        "data": AWS_SESSION_CREDENTIALS
+        "data": data
     })
 
 if __name__ == '__main__':
