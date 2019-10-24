@@ -11,7 +11,16 @@ app = Flask(__name__)
 
 VAULT_ADDR = 'https://vault.eng.appianci.net'
 
+AWS_SESSION_CREDENTIALS = {
+    'last_updated': datetime.now() - timedelta(hours=24),
+    'aws_access_key_id': None,
+    'aws_secret_access_key': None,
+    'aws_session_token': None
+}
+
 def refresh_aws_session_credentials():
+    global AWS_SESSION_CREDENTIALS
+
     # Get a token for an application role via get-vault-token
     completed_process = subprocess.run(['get-vault-token', '--application', 'rekognition-detect-text'], stdout=subprocess.PIPE, check=True)
     application_token = completed_process.stdout.decode().strip()
@@ -23,7 +32,7 @@ def refresh_aws_session_credentials():
     response.raise_for_status()
     r = response.json()
 
-    return {
+    AWS_SESSION_CREDENTIALS = {
         'last_updated': datetime.now(),
         'aws_access_key_id': r['data']['access_key'],
         'aws_secret_access_key': r['data']['secret_key'],
@@ -40,7 +49,10 @@ def dummy():
 
 @app.route('/api/interface/generate')
 def interface_generate():
-    data = refresh_aws_session_credentials()
+    global AWS_SESSION_CREDENTIALS
+
+    if datetime.now() - AWS_SESSION_CREDENTIALS['last_updated'] > timedelta(minutes=55):
+        refresh_aws_session_credentials()
 
 
 
@@ -54,7 +66,7 @@ def interface_generate():
 
     return jsonify({
         "success": True,
-        "data": data
+        "data": AWS_SESSION_CREDENTIALS
     })
 
 if __name__ == '__main__':
